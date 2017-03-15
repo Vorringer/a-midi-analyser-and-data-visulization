@@ -1,0 +1,171 @@
+﻿<html>
+<head>
+    <meta charset="utf-8">
+    <title>Mozart</title>
+
+    <style>
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: black;
+            shape-rendering: crispEdges;
+        }
+
+        .axis text {
+            font-family: sans-serif;
+            font-size: 11px;
+        }
+
+        .MyRect {
+            fill: steelblue;
+        }
+
+        .MyText {
+            fill: white;
+            text-anchor: middle;
+            font-family: 'Microsoft YaHei UI';
+        }
+    </style>
+
+</head>
+
+<body>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script>
+
+        //画布大小
+        var width = 1300;
+        var height = 500;
+
+        //在 body 里添加一个 SVG 画布
+        var svg = d3.select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        //画布周边的空白
+        var padding = { left: 450, right: 450, top: 50, bottom: 50 };
+
+        //定义一个数组
+        var dataset = [8.8,10.8,12.0,0.57,10];
+        var datamax=[15.7473,14.4116,16.7457,0.611157,13]
+        var txt=["平均每分钟音符数","音符标准差","力度标准差","不稳定音程率","最大跨度"]
+        //x轴的比例尺
+        var xScale = d3.scale.ordinal()
+            .domain(txt)
+            .rangeRoundBands([0, width - padding.left - padding.right]);
+
+        //y轴的比例尺
+        var yScale = d3.scale.linear()
+            .domain([0, 1])
+            .range([height - padding.top - padding.bottom, 0]);
+
+        //定义x轴
+        var xAxis = d3.svg.axis()
+            .scale(xScale)
+            .orient("bottom");
+
+        //定义y轴
+        var yAxis = d3.svg.axis()
+            .scale(yScale)
+            .orient("left");
+
+        //矩形之间的空白
+        var rectPadding = 10;
+
+        //添加矩形元素
+        var rects = svg.selectAll(".MyRect")
+            .data(dataset)
+            .enter()
+            .append("rect")
+            .attr("class", "MyRect")
+            .attr("transform", "translate(" + padding.left + "," + padding.top + ")")
+            .attr("x", function (d, i) {
+                return xScale(txt[i]) + rectPadding / 2;
+            })
+            .attr("width", xScale.rangeBand() - rectPadding)
+            .attr("y", function (d) {
+                var min = yScale.domain()[0];
+                return yScale(min);
+            })
+            .attr("height", function (d) {
+                return 0;
+            })
+            .transition()
+            .delay(function (d, i) {
+                return i * 200;
+            })
+            .duration(2000)
+            .ease("bounce")
+            .attr("y", function (d,i) {
+                return yScale(d/datamax[i]);
+            })
+            .attr("height", function (d,i) {
+                return height - padding.top - padding.bottom - yScale(d/datamax[i]);
+            });
+        //添加文字元素
+        var texts = svg.selectAll(".MyText")
+            .data(dataset)
+            .enter()
+            .append("text")
+            .attr("class", "MyText")
+            .attr("transform", "translate(" + padding.left + "," + padding.top + ")")
+            .attr("x", function (d, i) {
+                return xScale(txt[i]) + rectPadding / 2;
+            })
+            .attr("dx", function () {
+                return (xScale.rangeBand() - rectPadding) / 2;
+            })
+            .attr("dy", function (d) {
+                return 20;
+            })
+            .text(function (d) {
+                return d;
+            })
+            .attr("y", function (d) {
+                var min = yScale.domain()[0];
+                return yScale(min);
+            })
+            .transition()
+            .delay(function (d, i) {
+                return i * 200;
+            })
+            .duration(2000)
+            .ease("bounce")
+            .attr("y", function (d,i) {
+                return yScale(d/datamax[i]);
+            });
+        //添加x轴
+        svg.append("g")
+            .attr("class", "axis")
+            .attr("transform", "translate(" + padding.left + "," + (height - padding.bottom) + ")")
+            .call(xAxis);
+
+        //添加y轴
+        svg.append("g")
+            .attr("class", "axis")
+            .attr("transform", "translate(" + padding.left + "," + padding.top + ")")
+            .call(yAxis);
+        var topTxt = svg.append("text")
+                .attr("x", 560)
+                .attr("y", 50)
+                .attr("font-size", 20)
+                .attr("font-family", "Microsoft YaHei UI")
+                .text("Analysis of Mozart's Works");
+        var leftTxt = svg.append("text")
+                .attr("x", 400)
+                .attr("y", 400)
+                .attr("font-size", 20)
+                .attr("transform","rotate(-90,400,400)")
+                .attr("font-family", "Microsoft YaHei UI")
+                .text("相对同属性最大值的百分比");
+    </script>
+    <svg>
+        <a xlink:href="..\dataVisualizationHomePage.html">
+            <rect x="100" y="0" width="100" height="30" rx="10" ry="10"
+                  style="fill:lightgrey" />
+            <text x="130" y="20" font-size="15" font-family="Microsoft YaHei UI" font-weight="bold">返回</text>
+        </a>
+    </svg>
+</body>
+</html>  
